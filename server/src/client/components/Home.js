@@ -1,7 +1,7 @@
-import React form "react";
+import React from "react";
 
 const Home = () => {
-  return <div>This is the Home component.</div>
+  return <div>This is Jovi's Home component.</div>;
 };
 
 export default Home;
