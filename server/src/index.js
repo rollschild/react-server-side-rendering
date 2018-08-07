@@ -6,9 +6,10 @@ const Home = require("./client/components/Home").default; // ???
 */
 
 import express from "express";
-import React from "react";
-import { renderToString } from "react-dom/server";
-import Home from "./client/components/Home";
+// import React from "react";
+// import { renderToString } from "react-dom/server";
+// import Home from "./client/components/Home";
+import renderer from "./helpers/renderer";
 
 const app = express();
 
@@ -20,20 +21,9 @@ app.get("/", (req, res) => {
   // ...somehow recognize JSX code
   // solution: use webpack
   // need to create webpack config file
-  const content = renderToString(<Home />);
-
-  const html = `
-    <html>
-      <head></head>
-      <body>
-        <div id="root">${content}</div>
-        <script src="bundle.js"></script>
-      </body>
-    </html>
-  `;
 
   // send it back to whoever makes the request
-  res.send(html);
+  res.send(renderer());
 });
 
 app.listen(3000, () => {
