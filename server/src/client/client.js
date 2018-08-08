@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import { createStore, applyMiddleware } from "redux";
+import { renderRoutes } from "react-router-config";
 
 // asynchronous actions creators
 import thunk from "redux-thunk";
@@ -20,6 +21,7 @@ import reducers from "./reducers/index";
 const store = createStore(reducers, {}, applyMiddleware(thunk));
 
 // make sure to render the app in the same div
+/*
 ReactDOM.hydrate(
   <Provider store={store}>
     <BrowserRouter>
@@ -28,6 +30,17 @@ ReactDOM.hydrate(
   </Provider>,
   document.querySelector("#root")
 );
+*/
+
+ReactDOM.hydrate(
+  <Provider store={store}>
+    <BrowserRouter>
+      <div>{renderRoutes(Routes)}</div>
+    </BrowserRouter>
+  </Provider>,
+  document.querySelector("#root")
+);
+
 // Tell react to go back through
 // ...and set up all event handlers
 // ...to bind to the existing structure

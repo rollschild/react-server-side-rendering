@@ -6,6 +6,8 @@ const Home = require("./client/components/Home").default; // ???
 */
 import "babel-polyfill";
 import express from "express";
+import { matchRoutes } from "react-router-config";
+import Routes from "./client/Routes";
 // import React from "react";
 // import { renderToString } from "react-dom/server";
 // import Home from "./client/components/Home";
@@ -27,8 +29,17 @@ app.get("*", (req, res) => {
   // solution: use webpack
   // need to create webpack config file
 
-  // send it back to whoever makes the request
-  res.send(renderer(req, store));
+  //                                               de-structuring
+  //                                                  vvvvvvvvv
+  const promises = matchRoutes(Routes, req.path).map(({ route }) => {
+    return route.loadData ? route.loadData(store) : null;
+  });
+  console.log(promises);
+
+  Promise.all(promises).then(() => {
+    // send it back to whoever makes the request
+    res.send(renderer(req, store));
+  });
 });
 
 app.listen(3000, () => {

@@ -27,6 +27,17 @@ function mapStateToProps(state) {
   return { users: state.users };
 }
 
+// we do not want to render yet,
+// ...so we do not use connect or Provider
+function loadData(store) {
+  // console.log("Loading some data...");
+  return store.dispatch(fetchUsers());
+  // this line returns a promise representing
+  // ...the underlying request
+}
+
+export { loadData };
+
 export default connect(
   mapStateToProps,
   { fetchUsers }

@@ -156,6 +156,12 @@ var _express = __webpack_require__(7);
 
 var _express2 = _interopRequireDefault(_express);
 
+var _reactRouterConfig = __webpack_require__(18);
+
+var _Routes = __webpack_require__(10);
+
+var _Routes2 = _interopRequireDefault(_Routes);
+
 var _renderer = __webpack_require__(8);
 
 var _renderer2 = _interopRequireDefault(_renderer);
@@ -190,8 +196,19 @@ app.get("*", function (req, res) {
   // solution: use webpack
   // need to create webpack config file
 
-  // send it back to whoever makes the request
-  res.send((0, _renderer2.default)(req, store));
+  //                                               de-structuring
+  //                                                  vvvvvvvvv
+  var promises = (0, _reactRouterConfig.matchRoutes)(_Routes2.default, req.path).map(function (_ref) {
+    var route = _ref.route;
+
+    return route.loadData ? route.loadData(store) : null;
+  });
+  console.log(promises);
+
+  Promise.all(promises).then(function () {
+    // send it back to whoever makes the request
+    res.send((0, _renderer2.default)(req, store));
+  });
 });
 
 app.listen(3000, function () {
@@ -231,6 +248,8 @@ var _reactRouterDom = __webpack_require__(1);
 
 var _reactRedux = __webpack_require__(2);
 
+var _reactRouterConfig = __webpack_require__(18);
+
 var _Routes = __webpack_require__(10);
 
 var _Routes2 = _interopRequireDefault(_Routes);
@@ -244,13 +263,27 @@ exports.default = function (req, store) {
   // ...which set of components to show
   // ...on the screen
   // ...for example, '/'
+  /* NO LONGER VALID with react-router-config
+  const content = renderToString(
+    <Provider store={store}>
+      <StaticRouter location={req.path} context={{}}>
+        <Routes />
+      </StaticRouter>
+    </Provider>
+  );
+  */
+
   var content = (0, _server.renderToString)(_react2.default.createElement(
     _reactRedux.Provider,
     { store: store },
     _react2.default.createElement(
       _reactRouterDom.StaticRouter,
       { location: req.path, context: {} },
-      _react2.default.createElement(_Routes2.default, null)
+      _react2.default.createElement(
+        "div",
+        null,
+        (0, _reactRouterConfig.renderRoutes)(_Routes2.default)
+      )
     )
   ));
 
@@ -278,8 +311,6 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(1);
-
 var _Home = __webpack_require__(11);
 
 var _Home2 = _interopRequireDefault(_Home);
@@ -290,17 +321,38 @@ var _UsersList2 = _interopRequireDefault(_UsersList);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = function () {
-  return _react2.default.createElement(
-    "div",
-    null,
-    _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: "/", component: _Home2.default }),
-    _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: "/test", component: function component() {
-        return "Test";
-      } }),
-    _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: "/users", component: _UsersList2.default })
+/* with react-router-config, we can NO LONGER
+ * use the following Route setup
+export default () => {
+  
+  return (
+    <div>
+      <Route exact path="/" component={Home} />
+      <Route exact path="/test" component={() => "Test"} />
+      <Route exact path="/users" component={UsersList} />
+    </div>
   );
+  
 };
+*/
+
+exports.default = [{
+  path: "/",
+  component: _Home2.default,
+  exact: true
+}, {
+  loadData: _UsersList.loadData,
+  path: "/users",
+  component: _UsersList2.default,
+  exact: true
+}, {
+  path: "/test",
+  component: function component() {
+    return "Test";
+  },
+  exact: true
+}];
+// import { Route } from "react-router-dom";
 
 /***/ }),
 /* 11 */
@@ -350,6 +402,7 @@ exports.default = Home;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.loadData = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -417,6 +470,16 @@ function mapStateToProps(state) {
   return { users: state.users };
 }
 
+// we do not want to render yet,
+// ...so we do not use connect or Provider
+function loadData(store) {
+  // console.log("Loading some data...");
+  return store.dispatch((0, _index.fetchUsers)());
+  // this line returns a promise representing
+  // ...the underlying request
+}
+
+exports.loadData = loadData;
 exports.default = (0, _reactRedux.connect)(mapStateToProps, { fetchUsers: _index.fetchUsers })(UsersList);
 
 /***/ }),
@@ -508,6 +571,12 @@ exports.default = function () {
       return state;
   }
 };
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-router-config");
 
 /***/ })
 /******/ ]);
