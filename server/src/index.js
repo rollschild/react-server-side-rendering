@@ -16,14 +16,17 @@ const app = express();
 app.use(express.static("public"));
 // treat the public folder as public to browsers
 
-app.get("/", (req, res) => {
+// get("*") means no matter what,
+// ...express always passes requests to the
+// ...render
+app.get("*", (req, res) => {
   // here we need to make node.js
   // ...somehow recognize JSX code
   // solution: use webpack
   // need to create webpack config file
 
   // send it back to whoever makes the request
-  res.send(renderer());
+  res.send(renderer(req));
 });
 
 app.listen(3000, () => {
