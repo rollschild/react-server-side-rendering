@@ -102,6 +102,10 @@ var _UsersListPage = __webpack_require__(11);
 
 var _UsersListPage2 = _interopRequireDefault(_UsersListPage);
 
+var _App = __webpack_require__(21);
+
+var _App2 = _interopRequireDefault(_App);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* with react-router-config, we can NO LONGER
@@ -119,21 +123,26 @@ export default () => {
 };
 */
 
-exports.default = [_extends({}, _HomePage2.default, {
-  path: "/",
-  exact: true
-}), _extends({}, _UsersListPage2.default, {
-  // loadData,
-  path: "/users",
-  // component: UsersListPage,
-  exact: true
-}), {
-  path: "/test",
-  component: function component() {
-    return "Test";
-  },
-  exact: true
-}];
+exports.default = [_extends({}, _App2.default, { // no path tied to it
+  // ...meaning it's always on display
+
+  // the following is nested inside App
+  routes: [_extends({}, _HomePage2.default, {
+    path: "/",
+    exact: true
+  }), _extends({}, _UsersListPage2.default, {
+    // loadData,
+    path: "/users",
+    // component: UsersListPage,
+    exact: true
+  }), {
+    path: "/test",
+    component: function component() {
+      return "Test";
+    },
+    exact: true
+  }]
+})];
 
 /***/ }),
 /* 3 */
@@ -192,6 +201,40 @@ var fetchUsers = exports.fetchUsers = function fetchUsers() {
   }();
 };
 
+var FETCH_CURRENT_USER = exports.FETCH_CURRENT_USER = "fetch_current_user";
+var fetchCurrentUser = exports.fetchCurrentUser = function fetchCurrentUser() {
+  return function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(dispatch, getState, api) {
+      var res;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return api.get("/current_user");
+
+            case 2:
+              res = _context2.sent;
+
+              dispatch({
+                type: FETCH_CURRENT_USER,
+                payload: res
+              });
+
+            case 4:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2, undefined);
+    }));
+
+    return function (_x4, _x5, _x6) {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+};
+
 /***/ }),
 /* 5 */
 /***/ (function(module, exports) {
@@ -244,6 +287,7 @@ var app = (0, _express2.default)(); /*
 
 app.use("/api", (0, _expressHttpProxy2.default)("http://react-ssr-api.herokuapp.com", {
   proxyReqOptDecorator: function proxyReqOptDecorator(opts) {
+    // redirect to localhost after oauth process
     opts.headers["x-forwarded-host"] = "localhost:3000";
     return opts;
   }
@@ -319,18 +363,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var HomePage = function HomePage() {
   return _react2.default.createElement(
     "div",
-    null,
+    { className: "center-align", style: { marginTop: "200px" } },
     _react2.default.createElement(
-      "div",
+      "h3",
       null,
-      "This is Jovi's Home component."
+      "Hi"
     ),
     _react2.default.createElement(
-      "button",
-      { onClick: function onClick() {
-          return console.log("Button pressed!");
-        } },
-      "Press me please..."
+      "p",
+      null,
+      "This is how I implemented React Server Side Rendering"
     )
   );
 };
@@ -496,7 +538,7 @@ exports.default = function (req, store) {
     )
   ));
 
-  return "\n    <html>\n      <head></head>\n      <body>\n        <div id=\"root\">" + content + "</div>\n        <script>\n          window.INITIAL_STATE = " + (0, _serializeJavascript2.default)(store.getState()) + "\n        </script>\n        <script src=\"bundle.js\"></script>\n      </body>\n    </html>\n  ";
+  return "\n    <html>\n      <head>\n        <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css\">\n      </head>\n      <body>\n        <div id=\"root\">" + content + "</div>\n        <script>\n          window.INITIAL_STATE = " + (0, _serializeJavascript2.default)(store.getState()) + "\n        </script>\n        <script src=\"bundle.js\"></script>\n      </body>\n    </html>\n  ";
 };
 
 /***/ }),
@@ -585,11 +627,16 @@ var _usersReducer = __webpack_require__(20);
 
 var _usersReducer2 = _interopRequireDefault(_usersReducer);
 
+var _authReducer = __webpack_require__(23);
+
+var _authReducer2 = _interopRequireDefault(_authReducer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = (0, _redux.combineReducers)({
   // users property of the state object
-  users: _usersReducer2.default
+  users: _usersReducer2.default,
+  auth: _authReducer2.default
 });
 
 /***/ }),
@@ -616,6 +663,163 @@ exports.default = function () {
       return state;
   }
 };
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterConfig = __webpack_require__(1);
+
+var _Header = __webpack_require__(22);
+
+var _Header2 = _interopRequireDefault(_Header);
+
+var _actions = __webpack_require__(4);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var App = function App(_ref) {
+  var route = _ref.route;
+
+  return _react2.default.createElement(
+    "div",
+    null,
+    _react2.default.createElement(_Header2.default, null),
+    (0, _reactRouterConfig.renderRoutes)(route.routes)
+  );
+};
+
+exports.default = {
+  component: App,
+  loadData: function loadData(_ref2) {
+    var dispatch = _ref2.dispatch;
+    return dispatch((0, _actions.fetchCurrentUser)());
+  }
+};
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(14);
+
+var _reactRedux = __webpack_require__(3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Header = function Header(_ref) {
+  var auth = _ref.auth;
+
+  console.log("My auth status is ", auth);
+
+  var authButton = auth ? _react2.default.createElement(
+    "a",
+    { href: "/api/logout" },
+    "Logout"
+  ) : _react2.default.createElement(
+    "a",
+    { href: "/api/auth/google" },
+    "Login"
+  );
+
+  return _react2.default.createElement(
+    "nav",
+    null,
+    _react2.default.createElement(
+      "div",
+      { className: "nav-wrapper" },
+      _react2.default.createElement(
+        _reactRouterDom.Link,
+        { to: "/", className: "brand-logo" },
+        "React-Server-Side-Rendering"
+      ),
+      _react2.default.createElement(
+        "ul",
+        { className: "right" },
+        _react2.default.createElement(
+          "li",
+          null,
+          _react2.default.createElement(
+            _reactRouterDom.Link,
+            { to: "/users" },
+            "Users"
+          )
+        ),
+        _react2.default.createElement(
+          "li",
+          null,
+          _react2.default.createElement(
+            _reactRouterDom.Link,
+            { to: "/admins" },
+            "Admins"
+          )
+        ),
+        _react2.default.createElement(
+          "li",
+          null,
+          authButton
+        )
+      )
+    )
+  );
+};
+
+function mapStateToProps(_ref2) {
+  var auth = _ref2.auth;
+
+  return { auth: auth };
+}
+
+// Now the Header component should receive a
+// ...prop called auth
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(Header);
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case _index.FETCH_CURRENT_USER:
+      return action.payload.data || false;
+    default:
+      return state;
+  }
+};
+
+var _index = __webpack_require__(4);
 
 /***/ })
 /******/ ]);

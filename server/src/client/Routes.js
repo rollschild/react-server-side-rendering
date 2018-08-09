@@ -2,6 +2,7 @@ import React from "react";
 // import { Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import UsersListPage from "./pages/UsersListPage";
+import App from "./App";
 
 /* with react-router-config, we can NO LONGER
  * use the following Route setup
@@ -20,20 +21,28 @@ export default () => {
 
 export default [
   {
-    ...HomePage,
-    path: "/",
-    exact: true
-  },
-  {
-    ...UsersListPage,
-    // loadData,
-    path: "/users",
-    // component: UsersListPage,
-    exact: true
-  },
-  {
-    path: "/test",
-    component: () => "Test",
-    exact: true
+    ...App, // no path tied to it
+    // ...meaning it's always on display
+
+    // the following is nested inside App
+    routes: [
+      {
+        ...HomePage,
+        path: "/",
+        exact: true
+      },
+      {
+        ...UsersListPage,
+        // loadData,
+        path: "/users",
+        // component: UsersListPage,
+        exact: true
+      },
+      {
+        path: "/test",
+        component: () => "Test",
+        exact: true
+      }
+    ]
   }
 ];

@@ -2,11 +2,9 @@ import React from "react";
 
 const HomePage = () => {
   return (
-    <div>
-      <div>This is Jovi's Home component.</div>
-      <button onClick={() => console.log("Button pressed!")}>
-        Press me please...
-      </button>
+    <div className="center-align" style={{ marginTop: "200px" }}>
+      <h3>Hi</h3>
+      <p>This is how I implemented React Server Side Rendering</p>
     </div>
   );
 };
