@@ -18,7 +18,11 @@ import Routes from "./Routes";
 
 import reducers from "./reducers/index";
 
-const store = createStore(reducers, {}, applyMiddleware(thunk));
+const store = createStore(
+  reducers,
+  window.INITIAL_STATE,
+  applyMiddleware(thunk)
+);
 
 // make sure to render the app in the same div
 /*

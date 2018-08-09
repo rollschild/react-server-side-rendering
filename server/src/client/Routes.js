@@ -1,8 +1,7 @@
 import React from "react";
 // import { Route } from "react-router-dom";
-import Home from "./components/Home";
-import UsersList from "./components/UsersList";
-import { loadData } from "./components/UsersList";
+import HomePage from "./pages/HomePage";
+import UsersListPage from "./pages/UsersListPage";
 
 /* with react-router-config, we can NO LONGER
  * use the following Route setup
@@ -21,14 +20,15 @@ export default () => {
 
 export default [
   {
+    ...HomePage,
     path: "/",
-    component: Home,
     exact: true
   },
   {
-    loadData,
+    ...UsersListPage,
+    // loadData,
     path: "/users",
-    component: UsersList,
+    // component: UsersListPage,
     exact: true
   },
   {
