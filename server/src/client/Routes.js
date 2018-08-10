@@ -2,6 +2,8 @@ import React from "react";
 // import { Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import UsersListPage from "./pages/UsersListPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import AdminsListPage from "./pages/AdminsListPage";
 import App from "./App";
 
 /* with react-router-config, we can NO LONGER
@@ -39,9 +41,18 @@ export default [
         exact: true
       },
       {
+        ...AdminsListPage,
+        path: "/admins",
+        exact: true
+      },
+      {
         path: "/test",
         component: () => "Test",
         exact: true
+      },
+      {
+        ...NotFoundPage
+        // we will NOT provide a path
       }
     ]
   }

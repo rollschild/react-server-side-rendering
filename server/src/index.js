@@ -49,8 +49,13 @@ app.get("*", (req, res) => {
   console.log(promises);
 
   Promise.all(promises).then(() => {
+    const context = {};
+    const content = renderer(req, store, context);
+    if (context.notFound) {
+      res.status(404);
+    }
     // send it back to whoever makes the request
-    res.send(renderer(req, store));
+    res.send(content);
   });
 });
 
